@@ -51,7 +51,7 @@ public final class Workarounds {
         // not instantiable
     }
 
-    public static void apply() {
+    public static void apply(String packageName) {
         if (Build.VERSION.SDK_INT >= AndroidVersions.API_31_ANDROID_12) {
             // On some Samsung devices, DisplayManagerGlobal.getDisplayInfoLocked() calls ActivityThread.currentActivityThread().getConfiguration(),
             // which requires a non-null ConfigurationController.
@@ -66,7 +66,7 @@ public final class Workarounds {
         boolean mustFillAppInfo = !Build.BRAND.equalsIgnoreCase("ONYX");
 
         if (mustFillAppInfo) {
-            fillAppInfo();
+            fillAppInfo(packageName);
         }
 
         fillAppContext();
@@ -85,7 +85,7 @@ public final class Workarounds {
         Looper.prepareMainLooper();
     }
 
-    private static void fillAppInfo() {
+    private static void fillAppInfo(String packageName) {
         try {
             // ActivityThread.AppBindData appBindData = new ActivityThread.AppBindData();
             Class<?> appBindDataClass = Class.forName("android.app.ActivityThread$AppBindData");
@@ -94,7 +94,7 @@ public final class Workarounds {
             Object appBindData = appBindDataConstructor.newInstance();
 
             ApplicationInfo applicationInfo = new ApplicationInfo();
-            applicationInfo.packageName = FakeContext.PACKAGE_NAME;
+            applicationInfo.packageName = packageName;
 
             // appBindData.appInfo = applicationInfo;
             Field appInfoField = appBindDataClass.getDeclaredField("appInfo");

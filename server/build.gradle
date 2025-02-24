@@ -10,11 +10,15 @@ android {
         versionCode 30100
         versionName "3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled false
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            minifyEnabled false
         }
     }
     buildFeatures {
@@ -28,3 +32,29 @@ dependencies {
 }
 
 apply from: "$project.rootDir/config/android-checkstyle.gradle"
+
+// 在 build.gradle 中添加以下配置
+
+tasks.register('makeJar', Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // 删除已存在的 jar
+    doFirst {
+        delete 'build/libs/scrcpy.jar'
+    }
+
+    // 设置归档文件的基本名称
+    archiveBaseName = 'scrcpy'
+
+    // 从编译后的类文件目录获取
+    from(project.file('build/intermediates/javac/release/classes/')) {
+        include '**/*.class'
+    }
+
+    // 直接指定输出文件
+    destinationDirectory = file('build/libs')
+}
+
+tasks.named('makeJar') {
+    dependsOn 'build'
+}
