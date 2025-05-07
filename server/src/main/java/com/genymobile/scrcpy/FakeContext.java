@@ -90,8 +90,11 @@ public final class FakeContext extends ContextWrapper {
     @TargetApi(AndroidVersions.API_31_ANDROID_12)
     @Override
     public AttributionSource getAttributionSource() {
+ 
         AttributionSource.Builder builder = new AttributionSource.Builder(uid);
         builder.setPackageName(packageName);
+ 
+ 
         return builder.build();
     }
     
