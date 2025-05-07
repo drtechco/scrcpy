@@ -626,4 +626,62 @@ public class Options {
 
         return Pair.create(lock, Orientation.getByName(value));
     }
+    
+    
+    @Override
+    public String toString() {
+        return "Options{" +
+                "logLevel=" + logLevel +
+                ", scid=" + scid +
+                ", video=" + video +
+                ", audio=" + audio +
+                ", maxSize=" + maxSize +
+                ", videoCodec=" + videoCodec +
+                ", audioCodec=" + audioCodec +
+                ", videoSource=" + videoSource +
+                ", audioSource=" + audioSource +
+                ", audioDup=" + audioDup +
+                ", videoBitRate=" + videoBitRate +
+                ", audioBitRate=" + audioBitRate +
+                ", maxFps=" + maxFps +
+                ", angle=" + angle +
+                ", tunnelForward=" + tunnelForward +
+                ", crop=" + crop +
+                ", control=" + control +
+                ", displayId=" + displayId +
+                ", cameraId='" + cameraId + '\'' +
+                ", cameraSize=" + cameraSize +
+                ", cameraFacing=" + cameraFacing +
+                ", cameraAspectRatio=" + cameraAspectRatio +
+                ", cameraFps=" + cameraFps +
+                ", cameraHighSpeed=" + cameraHighSpeed +
+                ", showTouches=" + showTouches +
+                ", stayAwake=" + stayAwake +
+                ", screenOffTimeout=" + screenOffTimeout +
+                ", videoCodecOptions=" + videoCodecOptions +
+                ", audioCodecOptions=" + audioCodecOptions +
+                ", videoEncoder='" + videoEncoder + '\'' +
+                ", audioEncoder='" + audioEncoder + '\'' +
+                ", powerOffScreenOnClose=" + powerOffScreenOnClose +
+                ", clipboardAutosync=" + clipboardAutosync +
+                ", downsizeOnError=" + downsizeOnError +
+                ", cleanup=" + cleanup +
+                ", powerOn=" + powerOn +
+                ", newDisplay=" + newDisplay +
+                ", vdDestroyContent=" + vdDestroyContent +
+                ", vdSystemDecorations=" + vdSystemDecorations +
+                ", captureOrientationLock=" + captureOrientationLock +
+                ", captureOrientation=" + captureOrientation +
+                ", listEncoders=" + listEncoders +
+                ", listDisplays=" + listDisplays +
+                ", listCameras=" + listCameras +
+                ", listCameraSizes=" + listCameraSizes +
+                ", listApps=" + listApps +
+                ", sendDeviceMeta=" + sendDeviceMeta +
+                ", sendFrameMeta=" + sendFrameMeta +
+                ", sendDummyByte=" + sendDummyByte +
+                ", sendCodecMeta=" + sendCodecMeta +
+                '}';
+        
+    }
 }

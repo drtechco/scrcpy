@@ -98,7 +98,7 @@ public final class Server {
         boolean audio = options.getAudio();
         boolean sendDummyByte = options.getSendDummyByte();
 
-        Workarounds.apply();
+        Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
 
         List<AsyncProcessor> asyncProcessors = new ArrayList<>();
 
@@ -214,8 +214,10 @@ public final class Server {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             Ln.e("Exception on thread " + t, e);
         });
+        Ln.i("Starting...");
 
         Options options = Options.parse(args);
+        Ln.i("Options: " + options);
 
         Ln.disableSystemStreams();
         Ln.initLogLevel(options.getLogLevel());
@@ -235,11 +237,11 @@ public final class Server {
                 Ln.i(LogUtils.buildDisplayListMessage());
             }
             if (options.getListCameras() || options.getListCameraSizes()) {
-                Workarounds.apply();
+                Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
                 Ln.i(LogUtils.buildCameraListMessage(options.getListCameraSizes()));
             }
             if (options.getListApps()) {
-                Workarounds.apply();
+                Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
                 Ln.i("Processing Android apps... (this may take some time)");
                 Ln.i(LogUtils.buildAppListMessage());
             }

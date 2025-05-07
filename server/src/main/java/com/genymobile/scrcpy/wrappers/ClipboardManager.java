@@ -139,47 +139,47 @@ public final class ClipboardManager {
 
     private static ClipData getPrimaryClip(Method method, int methodVersion, IInterface manager) throws ReflectiveOperationException {
         if (Build.VERSION.SDK_INT < AndroidVersions.API_29_ANDROID_10) {
-            return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME);
+            return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME);
         }
 
         switch (methodVersion) {
             case 0:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, FakeContext.ROOT_UID);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, FakeContext.ROOT_UID);
             case 1:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID);
             case 2:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
             case 3:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, FakeContext.ROOT_UID, null);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, FakeContext.ROOT_UID, null);
             case 4:
                 // The last boolean parameter is "userOperate"
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, true);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, true);
             case 5:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, null, null, null, FakeContext.ROOT_UID, 0, true);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, null, null, null, FakeContext.ROOT_UID, 0, true);
             default:
-                return (ClipData) method.invoke(manager, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, null);
+                return (ClipData) method.invoke(manager, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, null);
         }
     }
 
     private static void setPrimaryClip(Method method, int methodVersion, IInterface manager, ClipData clipData) throws ReflectiveOperationException {
         if (Build.VERSION.SDK_INT < AndroidVersions.API_29_ANDROID_10) {
-            method.invoke(manager, clipData, FakeContext.PACKAGE_NAME);
+            method.invoke(manager, clipData, FakeContext.SHELL_PACKAGE_NAME);
             return;
         }
 
         switch (methodVersion) {
             case 0:
-                method.invoke(manager, clipData, FakeContext.PACKAGE_NAME, FakeContext.ROOT_UID);
+                method.invoke(manager, clipData, FakeContext.SHELL_PACKAGE_NAME, FakeContext.ROOT_UID);
                 break;
             case 1:
-                method.invoke(manager, clipData, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID);
+                method.invoke(manager, clipData, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID);
                 break;
             case 2:
-                method.invoke(manager, clipData, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
+                method.invoke(manager, clipData, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
                 break;
             default:
                 // The last boolean parameter is "userOperate"
-                method.invoke(manager, clipData, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, true);
+                method.invoke(manager, clipData, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0, true);
         }
     }
 
@@ -212,19 +212,19 @@ public final class ClipboardManager {
     private static void addPrimaryClipChangedListener(Method method, int methodVersion, IInterface manager, IOnPrimaryClipChangedListener listener)
             throws ReflectiveOperationException {
         if (Build.VERSION.SDK_INT < AndroidVersions.API_29_ANDROID_10) {
-            method.invoke(manager, listener, FakeContext.PACKAGE_NAME);
+            method.invoke(manager, listener, FakeContext.SHELL_PACKAGE_NAME);
             return;
         }
 
         switch (methodVersion) {
             case 0:
-                method.invoke(manager, listener, FakeContext.PACKAGE_NAME, FakeContext.ROOT_UID);
+                method.invoke(manager, listener, FakeContext.SHELL_PACKAGE_NAME, FakeContext.ROOT_UID);
                 break;
             case 1:
-                method.invoke(manager, listener, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID);
+                method.invoke(manager, listener, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID);
                 break;
             default:
-                method.invoke(manager, listener, FakeContext.PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
+                method.invoke(manager, listener, FakeContext.SHELL_PACKAGE_NAME, null, FakeContext.ROOT_UID, 0);
                 break;
         }
     }
