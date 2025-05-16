@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Options {
-
+    
     private Ln.Level logLevel = Ln.Level.DEBUG;
     private int scid = -1; // 31-bit non-negative value, or -1
     private boolean video = true;
@@ -52,7 +52,7 @@ public class Options {
     private int displayImePolicy = -1;
     private List<CodecOption> videoCodecOptions;
     private List<CodecOption> audioCodecOptions;
-
+    
     private String videoEncoder;
     private String audioEncoder;
     private boolean powerOffScreenOnClose;
@@ -60,248 +60,277 @@ public class Options {
     private boolean downsizeOnError = true;
     private boolean cleanup = true;
     private boolean powerOn = true;
-
+    
     private NewDisplay newDisplay;
     private boolean vdDestroyContent = true;
     private boolean vdSystemDecorations = true;
-
+    
     private Orientation.Lock captureOrientationLock = Orientation.Lock.Unlocked;
     private Orientation captureOrientation = Orientation.Orient0;
-
+    
     private boolean listEncoders;
     private boolean listDisplays;
     private boolean listCameras;
     private boolean listCameraSizes;
     private boolean listApps;
-
+    
     // Options not used by the scrcpy client, but useful to use scrcpy-server directly
     private boolean sendDeviceMeta = true; // send device name and size
     private boolean sendFrameMeta = true; // send PTS so that the client may record properly
     private boolean sendDummyByte = true; // write a byte on start to detect connection issues
     private boolean sendCodecMeta = true; // write the codec metadata before the stream
-
+    private boolean rawStream = false;
+    private boolean stdout;
+    
+    private String pidFile;
+    private boolean printTopApp;
+    
+    private String clipboard;
+    
+    public String getClipboard() {
+        return clipboard;
+    }
+    
+    
+    public boolean getPrintTopApp() {
+        return printTopApp;
+    }
+    
+    
+    public String getPidFile() {
+        return pidFile;
+    }
+    
+    
+    public boolean getStdout() {
+        return stdout;
+    }
+    
+    public boolean getRawStream() {
+        return rawStream;
+    }
+    
     public Ln.Level getLogLevel() {
         return logLevel;
     }
-
+    
     public int getScid() {
         return scid;
     }
-
+    
     public boolean getVideo() {
         return video;
     }
-
+    
     public boolean getAudio() {
         return audio;
     }
-
+    
     public int getMaxSize() {
         return maxSize;
     }
-
+    
     public VideoCodec getVideoCodec() {
         return videoCodec;
     }
-
+    
     public AudioCodec getAudioCodec() {
         return audioCodec;
     }
-
+    
     public VideoSource getVideoSource() {
         return videoSource;
     }
-
+    
     public AudioSource getAudioSource() {
         return audioSource;
     }
-
+    
     public boolean getAudioDup() {
         return audioDup;
     }
-
+    
     public int getVideoBitRate() {
         return videoBitRate;
     }
-
+    
     public int getAudioBitRate() {
         return audioBitRate;
     }
-
+    
     public float getMaxFps() {
         return maxFps;
     }
-
+    
     public float getAngle() {
         return angle;
     }
-
+    
     public boolean isTunnelForward() {
         return tunnelForward;
     }
-
+    
     public Rect getCrop() {
         return crop;
     }
-
+    
     public boolean getControl() {
         return control;
     }
-
+    
     public int getDisplayId() {
         return displayId;
     }
-
+    
     public String getCameraId() {
         return cameraId;
     }
-
+    
     public Size getCameraSize() {
         return cameraSize;
     }
-
+    
     public CameraFacing getCameraFacing() {
         return cameraFacing;
     }
-
+    
     public CameraAspectRatio getCameraAspectRatio() {
         return cameraAspectRatio;
     }
-
+    
     public int getCameraFps() {
         return cameraFps;
     }
-
+    
     public boolean getCameraHighSpeed() {
         return cameraHighSpeed;
     }
-
+    
     public boolean getShowTouches() {
         return showTouches;
     }
-
+    
     public boolean getStayAwake() {
         return stayAwake;
     }
-
+    
     public int getScreenOffTimeout() {
         return screenOffTimeout;
     }
-
+    
     public int getDisplayImePolicy() {
         return displayImePolicy;
     }
-
+    
     public List<CodecOption> getVideoCodecOptions() {
         return videoCodecOptions;
     }
-
+    
     public List<CodecOption> getAudioCodecOptions() {
         return audioCodecOptions;
     }
-
+    
     public String getVideoEncoder() {
         return videoEncoder;
     }
-
+    
     public String getAudioEncoder() {
         return audioEncoder;
     }
-
+    
     public boolean getPowerOffScreenOnClose() {
         return this.powerOffScreenOnClose;
     }
-
+    
     public boolean getClipboardAutosync() {
         return clipboardAutosync;
     }
-
+    
     public boolean getDownsizeOnError() {
         return downsizeOnError;
     }
-
+    
     public boolean getCleanup() {
         return cleanup;
     }
-
+    
     public boolean getPowerOn() {
         return powerOn;
     }
-
+    
     public NewDisplay getNewDisplay() {
         return newDisplay;
     }
-
+    
     public Orientation getCaptureOrientation() {
         return captureOrientation;
     }
-
+    
     public Orientation.Lock getCaptureOrientationLock() {
         return captureOrientationLock;
     }
-
+    
     public boolean getVDDestroyContent() {
         return vdDestroyContent;
     }
-
+    
     public boolean getVDSystemDecorations() {
         return vdSystemDecorations;
     }
-
+    
     public boolean getList() {
         return listEncoders || listDisplays || listCameras || listCameraSizes || listApps;
     }
-
+    
     public boolean getListEncoders() {
         return listEncoders;
     }
-
+    
     public boolean getListDisplays() {
         return listDisplays;
     }
-
+    
     public boolean getListCameras() {
         return listCameras;
     }
-
+    
     public boolean getListCameraSizes() {
         return listCameraSizes;
     }
-
+    
     public boolean getListApps() {
         return listApps;
     }
-
+    
     public boolean getSendDeviceMeta() {
         return sendDeviceMeta;
     }
-
+    
     public boolean getSendFrameMeta() {
         return sendFrameMeta;
     }
-
+    
     public boolean getSendDummyByte() {
         return sendDummyByte;
     }
-
+    
     public boolean getSendCodecMeta() {
         return sendCodecMeta;
     }
-
+    
     @SuppressWarnings("MethodLength")
     public static Options parse(String... args) {
         if (args.length < 1) {
             throw new IllegalArgumentException("Missing client version");
         }
-
+        
         String clientVersion = args[0];
         if (!clientVersion.equals(BuildConfig.VERSION_NAME)) {
-            throw new IllegalArgumentException(
-                    "The server version (" + BuildConfig.VERSION_NAME + ") does not match the client " + "(" + clientVersion + ")");
+            throw new IllegalArgumentException("The server version (" + BuildConfig.VERSION_NAME + ") does not match the client " + "(" + clientVersion + ")");
         }
-
+        
         Options options = new Options();
-
+        
         for (int i = 1; i < args.length; ++i) {
             String arg = args[i];
             int equalIndex = arg.indexOf('=');
@@ -317,6 +346,9 @@ public class Options {
                         throw new IllegalArgumentException("scid may not be negative (except -1 for 'none'): " + scid);
                     }
                     options.scid = scid;
+                    break;
+                case "stdout":
+                    options.stdout = Boolean.parseBoolean(value);
                     break;
                 case "log_level":
                     options.logLevel = Ln.Level.valueOf(value.toUpperCase(Locale.ENGLISH));
@@ -504,12 +536,27 @@ public class Options {
                     options.sendCodecMeta = Boolean.parseBoolean(value);
                     break;
                 case "raw_stream":
-                    boolean rawStream = Boolean.parseBoolean(value);
-                    if (rawStream) {
+                    options.rawStream = Boolean.parseBoolean(value);
+                    if (options.rawStream) {
                         options.sendDeviceMeta = false;
                         options.sendFrameMeta = false;
                         options.sendDummyByte = false;
                         options.sendCodecMeta = false;
+                    }
+                    break;
+                case "pid_file":
+                    if (!value.isEmpty()) {
+                        options.pidFile = value;
+                    }
+                    break;
+                case "print_top_app":
+                    if (!value.isEmpty()) {
+                        options.printTopApp = Boolean.parseBoolean(value);
+                    }
+                    break;
+                case "clipboard":
+                    if (!value.isEmpty()) {
+                        options.clipboard = value;
                     }
                     break;
                 default:
@@ -517,15 +564,15 @@ public class Options {
                     break;
             }
         }
-
+        
         if (options.newDisplay != null) {
             assert options.displayId == 0 : "Must not set both displayId and newDisplay";
             options.displayId = Device.DISPLAY_ID_NONE;
         }
-
+        
         return options;
     }
-
+    
     private static Rect parseCrop(String crop) {
         // input format: "width:height:x:y"
         String[] tokens = crop.split(":");
@@ -544,7 +591,7 @@ public class Options {
         }
         return new Rect(x, y, x + width, y + height);
     }
-
+    
     private static Size parseSize(String size) {
         // input format: "<width>x<height>"
         String[] tokens = size.split("x");
@@ -558,23 +605,23 @@ public class Options {
         }
         return new Size(width, height);
     }
-
+    
     private static CameraAspectRatio parseCameraAspectRatio(String ar) {
         if ("sensor".equals(ar)) {
             return CameraAspectRatio.sensorAspectRatio();
         }
-
+        
         String[] tokens = ar.split(":");
         if (tokens.length == 2) {
             int w = Integer.parseInt(tokens[0]);
             int h = Integer.parseInt(tokens[1]);
             return CameraAspectRatio.fromFraction(w, h);
         }
-
+        
         float floatAr = Float.parseFloat(tokens[0]);
         return CameraAspectRatio.fromFloat(floatAr);
     }
-
+    
     private static float parseFloat(String key, String value) {
         try {
             return Float.parseFloat(value);
@@ -582,7 +629,7 @@ public class Options {
             throw new IllegalArgumentException("Invalid float value for " + key + ": \"" + value + "\"");
         }
     }
-
+    
     private static NewDisplay parseNewDisplay(String newDisplay) {
         // Possible inputs:
         //  - "" (empty string)
@@ -592,16 +639,16 @@ public class Options {
         if (newDisplay.isEmpty()) {
             return new NewDisplay();
         }
-
+        
         String[] tokens = newDisplay.split("/");
-
+        
         Size size;
         if (!tokens[0].isEmpty()) {
             size = parseSize(tokens[0]);
         } else {
             size = null;
         }
-
+        
         int dpi;
         if (tokens.length >= 2) {
             dpi = Integer.parseInt(tokens[1]);
@@ -611,15 +658,15 @@ public class Options {
         } else {
             dpi = 0;
         }
-
+        
         return new NewDisplay(size, dpi);
     }
-
+    
     private static Pair<Orientation.Lock, Orientation> parseCaptureOrientation(String value) {
         if (value.isEmpty()) {
             throw new IllegalArgumentException("Empty capture orientation string");
         }
-
+        
         Orientation.Lock lock;
         if (value.charAt(0) == '@') {
             // Consume '@'
@@ -632,69 +679,17 @@ public class Options {
         } else {
             lock = Orientation.Lock.Unlocked;
         }
-
+        
         return Pair.create(lock, Orientation.getByName(value));
     }
- 
     
     
     @Override
     public String toString() {
-        return "Options{" +
-                "logLevel=" + logLevel +
-                ", scid=" + scid +
-                ", video=" + video +
-                ", audio=" + audio +
-                ", maxSize=" + maxSize +
-                ", videoCodec=" + videoCodec +
-                ", audioCodec=" + audioCodec +
-                ", videoSource=" + videoSource +
-                ", audioSource=" + audioSource +
-                ", audioDup=" + audioDup +
-                ", videoBitRate=" + videoBitRate +
-                ", audioBitRate=" + audioBitRate +
-                ", maxFps=" + maxFps +
-                ", angle=" + angle +
-                ", tunnelForward=" + tunnelForward +
-                ", crop=" + crop +
-                ", control=" + control +
-                ", displayId=" + displayId +
-                ", cameraId='" + cameraId + '\'' +
-                ", cameraSize=" + cameraSize +
-                ", cameraFacing=" + cameraFacing +
-                ", cameraAspectRatio=" + cameraAspectRatio +
-                ", cameraFps=" + cameraFps +
-                ", cameraHighSpeed=" + cameraHighSpeed +
-                ", showTouches=" + showTouches +
-                ", stayAwake=" + stayAwake +
-                ", screenOffTimeout=" + screenOffTimeout +
-                ", videoCodecOptions=" + videoCodecOptions +
-                ", audioCodecOptions=" + audioCodecOptions +
-                ", videoEncoder='" + videoEncoder + '\'' +
-                ", audioEncoder='" + audioEncoder + '\'' +
-                ", powerOffScreenOnClose=" + powerOffScreenOnClose +
-                ", clipboardAutosync=" + clipboardAutosync +
-                ", downsizeOnError=" + downsizeOnError +
-                ", cleanup=" + cleanup +
-                ", powerOn=" + powerOn +
-                ", newDisplay=" + newDisplay +
-                ", vdDestroyContent=" + vdDestroyContent +
-                ", vdSystemDecorations=" + vdSystemDecorations +
-                ", captureOrientationLock=" + captureOrientationLock +
-                ", captureOrientation=" + captureOrientation +
-                ", listEncoders=" + listEncoders +
-                ", listDisplays=" + listDisplays +
-                ", listCameras=" + listCameras +
-                ", listCameraSizes=" + listCameraSizes +
-                ", listApps=" + listApps +
-                ", sendDeviceMeta=" + sendDeviceMeta +
-                ", sendFrameMeta=" + sendFrameMeta +
-                ", sendDummyByte=" + sendDummyByte +
-                ", sendCodecMeta=" + sendCodecMeta +
-                '}';
+        return "Options{" + "logLevel=" + logLevel + ", scid=" + scid + ", video=" + video + ", audio=" + audio + ", maxSize=" + maxSize + ", videoCodec=" + videoCodec + ", audioCodec=" + audioCodec + ", videoSource=" + videoSource + ", audioSource=" + audioSource + ", audioDup=" + audioDup + ", videoBitRate=" + videoBitRate + ", audioBitRate=" + audioBitRate + ", maxFps=" + maxFps + ", angle=" + angle + ", tunnelForward=" + tunnelForward + ", crop=" + crop + ", control=" + control + ", displayId=" + displayId + ", cameraId='" + cameraId + '\'' + ", cameraSize=" + cameraSize + ", cameraFacing=" + cameraFacing + ", cameraAspectRatio=" + cameraAspectRatio + ", cameraFps=" + cameraFps + ", cameraHighSpeed=" + cameraHighSpeed + ", showTouches=" + showTouches + ", stayAwake=" + stayAwake + ", screenOffTimeout=" + screenOffTimeout + ", videoCodecOptions=" + videoCodecOptions + ", audioCodecOptions=" + audioCodecOptions + ", videoEncoder='" + videoEncoder + '\'' + ", audioEncoder='" + audioEncoder + '\'' + ", powerOffScreenOnClose=" + powerOffScreenOnClose + ", clipboardAutosync=" + clipboardAutosync + ", downsizeOnError=" + downsizeOnError + ", cleanup=" + cleanup + ", powerOn=" + powerOn + ", newDisplay=" + newDisplay + ", vdDestroyContent=" + vdDestroyContent + ", vdSystemDecorations=" + vdSystemDecorations + ", captureOrientationLock=" + captureOrientationLock + ", captureOrientation=" + captureOrientation + ", listEncoders=" + listEncoders + ", listDisplays=" + listDisplays + ", listCameras=" + listCameras + ", listCameraSizes=" + listCameraSizes + ", listApps=" + listApps + ", sendDeviceMeta=" + sendDeviceMeta + ", sendFrameMeta=" + sendFrameMeta + ", sendDummyByte=" + sendDummyByte + ", sendCodecMeta=" + sendCodecMeta + '}';
         
- 
-
+    }
+    
     private static int parseDisplayImePolicy(String value) {
         switch (value) {
             case "local":
@@ -706,6 +701,6 @@ public class Options {
             default:
                 throw new IllegalArgumentException("Invalid display IME policy: " + value);
         }
-
+        
     }
 }

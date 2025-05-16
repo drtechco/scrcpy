@@ -3,6 +3,7 @@ package com.genymobile.scrcpy.wrappers;
 import com.genymobile.scrcpy.AndroidVersions;
 import com.genymobile.scrcpy.FakeContext;
 import com.genymobile.scrcpy.util.Ln;
+import com.genymobile.scrcpy.util.ReflectUtils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -31,6 +32,8 @@ public final class ActivityManager {
     private Method forceStopPackageMethod;
     
     private Method getRunningAppProcessesMethod;
+    
+    private Method getRunningTasksMethod;
     
     static ActivityManager create() {
         try {
@@ -240,4 +243,25 @@ public final class ActivityManager {
             throw new RemoteException("Could not get running processes");
         }
     }
+    
+    
+    private Method getGetRunningTasksMethod() throws NoSuchMethodException {
+        //ReflectUtils.printAllMethods( manager.getClass());
+        if (getRunningTasksMethod == null) {
+            getRunningTasksMethod = manager.getClass().getMethod("getTasks", int.class);
+        }
+        return getRunningTasksMethod;
+    }
+    @SuppressWarnings("unchecked")
+    public List<android.app.ActivityManager.RunningTaskInfo> getRunningTasks(int maxNum) {
+        try {
+            Method method = getGetRunningTasksMethod();
+            return (List<android.app.ActivityManager.RunningTaskInfo>) method.invoke(manager, maxNum);
+        } catch (Exception e) {
+            Ln.e("Could not invoke getRunningTasks", e);
+            return null;
+        }
+    }
+    
+    
 }

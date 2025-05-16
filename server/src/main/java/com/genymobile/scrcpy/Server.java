@@ -17,38 +17,48 @@ import com.genymobile.scrcpy.device.Streamer;
 import com.genymobile.scrcpy.opengl.OpenGLRunner;
 import com.genymobile.scrcpy.util.Ln;
 import com.genymobile.scrcpy.util.LogUtils;
+import com.genymobile.scrcpy.util.ReflectUtils;
+import com.genymobile.scrcpy.util.StringUtils;
 import com.genymobile.scrcpy.video.CameraCapture;
 import com.genymobile.scrcpy.video.NewDisplayCapture;
 import com.genymobile.scrcpy.video.ScreenCapture;
 import com.genymobile.scrcpy.video.SurfaceCapture;
 import com.genymobile.scrcpy.video.SurfaceEncoder;
 import com.genymobile.scrcpy.video.VideoSource;
+import com.genymobile.scrcpy.wrappers.ActivityManager;
+import com.genymobile.scrcpy.wrappers.ServiceManager;
 
+import android.content.ComponentName;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Server {
-
+    
     public static final String SERVER_PATH;
-
+    
     static {
         String[] classPaths = System.getProperty("java.class.path").split(File.pathSeparator);
         // By convention, scrcpy is always executed with the absolute path of scrcpy-server.jar as the first item in the classpath
         SERVER_PATH = classPaths[0];
     }
-
+    
     private static class Completion {
         private int running;
         private boolean fatalError;
-
+        
         Completion(int running) {
             this.running = running;
         }
-
+        
         synchronized void addCompleted(boolean fatalError) {
             --running;
             if (fatalError) {
@@ -58,7 +68,7 @@ public final class Server {
                 notify();
             }
         }
-
+        
         synchronized void await() {
             try {
                 while (running > 0 && !fatalError) {
@@ -69,17 +79,17 @@ public final class Server {
             }
         }
     }
-
+    
     private Server() {
         // not instantiable
     }
-
+    
     private static void scrcpy(Options options) throws IOException, ConfigurationException {
         if (Build.VERSION.SDK_INT < AndroidVersions.API_31_ANDROID_12 && options.getVideoSource() == VideoSource.CAMERA) {
             Ln.e("Camera mirroring is not supported before Android 12");
             throw new ConfigurationException("Camera mirroring is not supported");
         }
-
+        
         if (Build.VERSION.SDK_INT < AndroidVersions.API_29_ANDROID_10) {
             if (options.getNewDisplay() != null) {
                 Ln.e("New virtual display is not supported before Android 10");
@@ -90,38 +100,39 @@ public final class Server {
                 throw new ConfigurationException("Display IME policy is not supported");
             }
         }
-
+        
         CleanUp cleanUp = null;
-
+        
         if (options.getCleanup()) {
             cleanUp = CleanUp.start(options);
         }
-
+        
         int scid = options.getScid();
         boolean tunnelForward = options.isTunnelForward();
         boolean control = options.getControl();
         boolean video = options.getVideo();
         boolean audio = options.getAudio();
         boolean sendDummyByte = options.getSendDummyByte();
-
+        boolean stdout = options.getStdout();
+        
         Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
-
+        
         List<AsyncProcessor> asyncProcessors = new ArrayList<>();
-
-        DesktopConnection connection = DesktopConnection.open(scid, tunnelForward, video, audio, control, sendDummyByte);
+        
+        DesktopConnection connection = DesktopConnection.open(scid, stdout, tunnelForward, video, audio, control, sendDummyByte);
         try {
             if (options.getSendDeviceMeta()) {
                 connection.sendDeviceMeta(Device.getDeviceName());
             }
-
+            
             Controller controller = null;
-
+            
             if (control) {
                 ControlChannel controlChannel = connection.getControlChannel();
                 controller = new Controller(controlChannel, cleanUp, options);
                 asyncProcessors.add(controller);
             }
-
+            
             if (audio) {
                 AudioCodec audioCodec = options.getAudioCodec();
                 AudioSource audioSource = options.getAudioSource();
@@ -131,7 +142,7 @@ public final class Server {
                 } else {
                     audioCapture = new AudioPlaybackCapture(options.getAudioDup());
                 }
-
+                
                 Streamer audioStreamer = new Streamer(connection.getAudioFd(), audioCodec, options.getSendCodecMeta(), options.getSendFrameMeta());
                 AsyncProcessor audioRecorder;
                 if (audioCodec == AudioCodec.RAW) {
@@ -141,10 +152,9 @@ public final class Server {
                 }
                 asyncProcessors.add(audioRecorder);
             }
-
+            
             if (video) {
-                Streamer videoStreamer = new Streamer(connection.getVideoFd(), options.getVideoCodec(), options.getSendCodecMeta(),
-                        options.getSendFrameMeta());
+                Streamer videoStreamer = new Streamer(connection.getVideoFd(), options.getVideoCodec(), options.getSendCodecMeta(), options.getSendFrameMeta());
                 SurfaceCapture surfaceCapture;
                 if (options.getVideoSource() == VideoSource.DISPLAY) {
                     NewDisplay newDisplay = options.getNewDisplay();
@@ -159,19 +169,19 @@ public final class Server {
                 }
                 SurfaceEncoder surfaceEncoder = new SurfaceEncoder(surfaceCapture, videoStreamer, options);
                 asyncProcessors.add(surfaceEncoder);
-
+                
                 if (controller != null) {
                     controller.setSurfaceCapture(surfaceCapture);
                 }
             }
-
+            
             Completion completion = new Completion(asyncProcessors.size());
             for (AsyncProcessor asyncProcessor : asyncProcessors) {
                 asyncProcessor.start((fatalError) -> {
                     completion.addCompleted(fatalError);
                 });
             }
-
+            
             completion.await();
         } finally {
             if (cleanUp != null) {
@@ -180,11 +190,11 @@ public final class Server {
             for (AsyncProcessor asyncProcessor : asyncProcessors) {
                 asyncProcessor.stop();
             }
-
+            
             OpenGLRunner.quit(); // quit the OpenGL thread, if any
-
+            
             connection.shutdown();
-
+            
             try {
                 if (cleanUp != null) {
                     cleanUp.join();
@@ -196,11 +206,11 @@ public final class Server {
             } catch (InterruptedException e) {
                 // ignore
             }
-
+            
             connection.close();
         }
     }
-
+    
     public static void main(String... args) {
         int status = 0;
         try {
@@ -215,26 +225,25 @@ public final class Server {
             System.exit(status);
         }
     }
-
+    
     private static void internalMain(String... args) throws Exception {
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            Ln.e("Exception on thread " + t, e);
-        });
-        Ln.i("Starting...");
-
         Options options = Options.parse(args);
-        Ln.i("Options: " + options);
-
         Ln.disableSystemStreams();
-        Ln.initLogLevel(options.getLogLevel());
-
-        Ln.i("Device: [" + Build.MANUFACTURER + "] " + Build.BRAND + " " + Build.MODEL + " (Android " + Build.VERSION.RELEASE + ")");
-
+        if (!options.getRawStream()) {
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                Ln.e("Exception on thread " + t, e);
+            });
+            Ln.i("Starting...");
+            Ln.i("Options: " + options);
+            Ln.i("Device: [" + Build.MANUFACTURER + "] " + Build.BRAND + " " + Build.MODEL + " (Android " + Build.VERSION.RELEASE + ")");
+            Ln.initLogLevel(options.getLogLevel());
+        }
+        
         if (options.getList()) {
             if (options.getCleanup()) {
                 CleanUp.unlinkSelf();
             }
-
+            
             if (options.getListEncoders()) {
                 Ln.i(LogUtils.buildVideoEncoderListMessage());
                 Ln.i(LogUtils.buildAudioEncoderListMessage());
@@ -254,11 +263,108 @@ public final class Server {
             // Just print the requested data, do not mirror
             return;
         }
-
+        if (!StringUtils.isEmpty(options.getPidFile())) {
+            try {
+                writePid(options);
+            } catch (IOException e) {
+                Ln.e("Failed to write pid to file: " + e.getMessage());
+            }
+        }
+        if (options.getPrintTopApp()) {
+            try {
+                printForegroundActivity();
+            } catch (Exception e) {
+                Ln.e("Failed to printForegroundActivity: " + e.getMessage());
+                System.exit(1);
+            }
+            return;
+        }
+        if (!StringUtils.isEmpty(options.getClipboard())) {
+            String clipboardText = options.getClipboard();
+            setClipboard(clipboardText);
+            System.exit(0);
+            return;
+        }
         try {
             scrcpy(options);
         } catch (ConfigurationException e) {
             // Do not print stack trace, a user-friendly error-message has already been logged
         }
+    }
+    
+    private static void setClipboard(String clipboardText) {
+        Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
+        ServiceManager.getClipboardManager().setText(clipboardText);
+    }
+    
+    private static void writePid(Options options) throws IOException {
+        if (!StringUtils.isEmpty(options.getPidFile())) {
+            String pidFile = options.getPidFile();
+            Log.d("scrcpy", "pid file: " + pidFile);
+            File file = new File(pidFile);
+            if (!file.exists()) {
+                int pid = android.os.Process.myPid();
+                String pidStr = String.valueOf(pid);
+                if (file.createNewFile()) {
+                    Log.i("scrcpy", "Create pid file: " + pidFile);
+                    Log.i("scrcpy", "Current process id: " + pidStr);
+                    // Write the current process id to the file
+                    try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
+                        writer.write(pidStr);
+                    } catch (Exception e) {
+                        throw new IOException("Failed to write pid to file: " + e.getMessage());
+                    }
+                } else {
+                    throw new IOException("Failed to create pid file");
+                }
+            } else {
+                throw new IOException("Pid file exists, exit process now");
+            }
+        }
+    }
+    
+    private static String getApplicationName(PackageManager pm, String packageName) {
+        try {
+            ApplicationInfo info = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            return pm.getApplicationLabel(info).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w("scrcpy", "Failed getApplicationName: " + e.getMessage());
+            return "未知应用";
+        }
+    }
+    
+    public static void printForegroundActivity() throws IOException {
+        String lastPkgName = "";
+        String lastClsName = "";
+        Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
+        ActivityManager am = ServiceManager.getActivityManager();
+        PackageManager pm = FakeContext.get().getPackageManager();
+        FileOutputStream Stdout = new FileOutputStream(FileDescriptor.out);
+//        Stdout.write("Foreground activity:\n".getBytes());
+        Stdout.flush();
+        while (true) {
+            List<android.app.ActivityManager.RunningTaskInfo> apps = am.getRunningTasks(1);
+            if (apps != null && !apps.isEmpty()) {
+                ComponentName component = apps.get(0).topActivity;
+                if (component != null) {
+                    String pkgName = component.getPackageName();
+                    String clsName = component.getClassName();
+                    if (pkgName.equals(lastPkgName) && clsName.equals(lastClsName)) {
+                        continue;
+                    }
+                    lastPkgName = pkgName;
+                    lastClsName = clsName;
+                    String appName = getApplicationName(pm, pkgName);
+                    Stdout.write((appName + ":" + pkgName + ":" + clsName + "\n").getBytes());
+                }
+            }
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+                Log.w("scrcpy", "Failed to sleep: " + e.getMessage());
+            }
+        }
+        
     }
 }

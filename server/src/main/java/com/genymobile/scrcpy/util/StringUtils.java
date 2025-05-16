@@ -19,4 +19,18 @@ public final class StringUtils {
         }
         return len;
     }
+    
+    public static boolean isEmpty(String str) {
+        if (str == null) {
+            return true;
+        }
+        if (str.isEmpty()) {
+            return true;
+        }
+        str = str.trim();
+        if (str.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,5 +1,6 @@
 package com.genymobile.scrcpy.device;
 
+import com.genymobile.scrcpy.StdLocalSocket;
 import com.genymobile.scrcpy.control.ControlChannel;
 import com.genymobile.scrcpy.util.IO;
 import com.genymobile.scrcpy.util.StringUtils;
@@ -53,7 +54,7 @@ public final class DesktopConnection implements Closeable {
         return SOCKET_NAME_PREFIX + String.format("_%08x", scid);
     }
 
-    public static DesktopConnection open(int scid, boolean tunnelForward, boolean video, boolean audio, boolean control, boolean sendDummyByte)
+    public static DesktopConnection open(int scid,boolean stdout, boolean tunnelForward, boolean video, boolean audio, boolean control, boolean sendDummyByte)
             throws IOException {
         String socketName = getSocketName(scid);
 
@@ -90,7 +91,12 @@ public final class DesktopConnection implements Closeable {
                 }
             } else {
                 if (video) {
-                    videoSocket = connect(socketName);
+                    if(stdout){
+                        videoSocket = new StdLocalSocket();
+                    }else{
+                        videoSocket = connect(socketName);
+                    }
+                   
                 }
                 if (audio) {
                     audioSocket = connect(socketName);
