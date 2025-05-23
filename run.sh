@@ -34,4 +34,4 @@ adb -s R5CR60F701M  push server/build/outputs/apk/debug/server-debug.apk /data/l
 
 adb -s R5CR60F701M shell CLASSPATH=/data/local/tmp/scrcpy-server-v3.2 \
     app_process / com.genymobile.scrcpy.Server 3.2 \
-    clipboard="我是你爹" raw_stream=true
+    wakeup_status=true raw_stream=true

@@ -28,10 +28,13 @@ import com.genymobile.scrcpy.video.VideoSource;
 import com.genymobile.scrcpy.wrappers.ActivityManager;
 import com.genymobile.scrcpy.wrappers.ServiceManager;
 
+import android.app.KeyguardManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.File;
@@ -279,6 +282,15 @@ public final class Server {
             }
             return;
         }
+        if (options.getWakeupStatus()) {
+            try {
+                printWakeupStatus();
+            } catch (Exception e) {
+                Ln.e("Failed to printForegroundActivity: " + e.getMessage());
+                System.exit(1);
+            }
+            return;
+        }
         if (!StringUtils.isEmpty(options.getClipboard())) {
             String clipboardText = options.getClipboard();
             setClipboard(clipboardText);
@@ -289,6 +301,32 @@ public final class Server {
             scrcpy(options);
         } catch (ConfigurationException e) {
             // Do not print stack trace, a user-friendly error-message has already been logged
+        }
+    }
+    
+    private static void printWakeupStatus() {
+        Workarounds.apply(FakeContext.SHELL_PACKAGE_NAME);
+        
+        boolean lastAvailable = false;
+        while (true) {
+            FileOutputStream Stdout = new FileOutputStream(FileDescriptor.out);
+            KeyguardManager km = (KeyguardManager) FakeContext.get().getSystemService(Context.KEYGUARD_SERVICE);
+            com.genymobile.scrcpy.wrappers.PowerManager pm = ServiceManager.getPowerManager();
+            boolean isLocked = km.isKeyguardLocked();
+            boolean isScreenOn = pm.isScreenOn(0);
+            boolean available = !isLocked && isScreenOn;
+            try {
+                if (available != lastAvailable) {
+                    if (available) {
+                        Stdout.write(("ON" + "\n").getBytes());
+                    } else {
+                        Stdout.write(("OFF" + "\n").getBytes());
+                    }
+                    lastAvailable = available;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     

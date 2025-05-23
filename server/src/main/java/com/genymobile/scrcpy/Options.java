@@ -87,6 +87,12 @@ public class Options {
     
     private String clipboard;
     
+    private boolean wakeupStatus;
+    
+    public boolean getWakeupStatus() {
+        return wakeupStatus;
+    }
+    
     public String getClipboard() {
         return clipboard;
     }
@@ -557,6 +563,11 @@ public class Options {
                 case "clipboard":
                     if (!value.isEmpty()) {
                         options.clipboard = value;
+                    }
+                    break;
+                case "wakeup_status":
+                    if (!value.isEmpty()) {
+                        options.wakeupStatus = Boolean.parseBoolean(value);
                     }
                     break;
                 default:
